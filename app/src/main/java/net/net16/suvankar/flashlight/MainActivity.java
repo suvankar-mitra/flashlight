@@ -3,6 +3,7 @@ package net.net16.suvankar.flashlight;
 import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Camera;
@@ -13,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Remove title bar
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //Only potrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -86,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         };
-        runOnUiThread(timerTask);
-
         timer.schedule(timerTask, 0, 10000);
 
         // load the animation
@@ -166,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},MY_PERMISSIONS_REQUEST_CAMERA);
         }
         else {
-            flashOnOff();
+            flashOnOffController();
         }
 
         //AdMob
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    flashOnOff();
+                    flashOnOffController();
 
                 } else {
 
@@ -196,67 +194,67 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void flashOnOff(){
+    private void flashOnOffController(){
         final ImageButton power = (ImageButton) findViewById(R.id.button);
         final boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-        assert power != null;
-        power.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!lightOn) {
-                    lightOn = true;
-                    if (hasFlash) {
-                        camera = Camera.open();
-                        Camera.Parameters parameters = camera.getParameters();
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                        camera.setParameters(parameters);
-                        camera.startPreview();
-
-                        ring.setVisibility(View.VISIBLE);
-                        ring2.setVisibility(View.VISIBLE);
-                        ring3.setVisibility(View.VISIBLE);
-                        ring4.setVisibility(View.VISIBLE);
-
-                        //start the animation
-                        ring.startAnimation(animFadein);
-                        ring.startAnimation(animFadeout);
-
-                        ring2.startAnimation(animFadein);
-                        ring2.startAnimation(animFadeout);
-
-                        ring3.startAnimation(animFadein);
-                        ring3.startAnimation(animFadeout);
-
-                        ring4.startAnimation(animFadein);
-                        ring4.startAnimation(animFadeout);
+        if (power == null) throw new AssertionError();
+        if (hasFlash) {
+            power.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!lightOn) {
+                        flashOn();
+                    } else if (lightOn) {
+                        flashOff();
                     }
-                } else if (lightOn) {
-                    lightOn = false;
-                    camera.stopPreview();
-                    camera.release();
-                    camera = null;
-
-                    ring.clearAnimation();
-                    ring2.clearAnimation();
-                    ring3.clearAnimation();
-                    ring4.clearAnimation();
-
-                    ring.setVisibility(View.INVISIBLE);
-                    ring2.setVisibility(View.INVISIBLE);
-                    ring3.setVisibility(View.INVISIBLE);
-                    ring4.setVisibility(View.INVISIBLE);
-
                 }
 
-            }
 
-        });
+            });
+        }
     }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        mAdView.pause();
+        flashOff();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //turn on the flash
+        flashOn();
+    }
+
+    protected void flashOn(){
+        //turn on the flash
+        camera = Camera.open();
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(parameters);
+        camera.startPreview();
+        ring.setVisibility(View.VISIBLE);
+        ring2.setVisibility(View.VISIBLE);
+        ring3.setVisibility(View.VISIBLE);
+        ring4.setVisibility(View.VISIBLE);
+
+        //start the animation
+        ring.startAnimation(animFadein);
+        ring.startAnimation(animFadeout);
+        ring2.startAnimation(animFadein);
+        ring2.startAnimation(animFadeout);
+
+        ring3.startAnimation(animFadein);
+        ring3.startAnimation(animFadeout);
+
+        ring4.startAnimation(animFadein);
+        ring4.startAnimation(animFadeout);
+        lightOn = true;
+    }
+
+    protected  void flashOff() {
         lightOn = false;
         if(camera!=null) {
             camera.stopPreview();
@@ -273,10 +271,5 @@ public class MainActivity extends AppCompatActivity {
         ring3.setVisibility(View.INVISIBLE);
         ring4.setVisibility(View.INVISIBLE);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mAdView.loadAd(adRequest);
-    }
 }
+
