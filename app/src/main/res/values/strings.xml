@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Flash Light</string>
+    <string name="power_on">Light On</string>
+    <string name="power_off">Light Off</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1300395620912543/2202578518</string>
+    <string name="sun">sun</string>
+    <string name="ring">ring</string>
+</resources>

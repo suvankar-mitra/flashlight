@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "185769988702",
+    "firebase_url": "https://admob-app-id-2606204516.firebaseio.com",
+    "project_id": "admob-app-id-2606204516",
+    "storage_bucket": "admob-app-id-2606204516.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185769988702:android:05b7843b85b336bf",
+        "android_client_info": {
+          "package_name": "net.net16.suvankar.flashlight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185769988702-ods2d433k7aq1kv7l437hu2j0lvb16ie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZjzd52eaTwrVQJMibzKbhnbLQ0XBZ0ZI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
