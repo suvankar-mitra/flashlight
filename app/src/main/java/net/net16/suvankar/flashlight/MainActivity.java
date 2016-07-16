@@ -17,8 +17,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -150,10 +152,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        final ImageButton power = (ImageButton) findViewById(R.id.button);
-        final boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -166,6 +164,21 @@ public class MainActivity extends AppCompatActivity {
         else {
             flashOnOffController();
         }
+
+        Switch switchCompat=(Switch)findViewById(R.id.switch1);
+
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(isChecked){
+
+                }
+                else{
+
+                }
+            }
+        });
 
         //AdMob
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-1300395620912543~9725845314");
