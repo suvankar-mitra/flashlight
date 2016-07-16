@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private Intent batteryStatus;
     private Timer timer = new Timer();
     private TimerTask timerTask;
+    private Switch aSwitch;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +73,11 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
                         batteryStatus = registerReceiver(null, ifilter);
+
                         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                        batteryTextView.setText("Battery level "+level+"%");
+                        if (batteryTextView != null) {
+                            batteryTextView.setText("Battery level "+level+"%");
+                        }
                         if(level >= 50){
                             batteryTextView.setTextColor(Color.GREEN);
                         }
@@ -165,18 +170,15 @@ public class MainActivity extends AppCompatActivity {
             flashOnOffController();
         }
 
-        Switch switchCompat=(Switch)findViewById(R.id.switch1);
-
-        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        aSwitch =(Switch)findViewById(R.id.switch1);
+        final Intent intent = new Intent(this, ScreenIlluminateActivity.class);
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 if(isChecked){
-
+                    startActivity(intent);
                 }
-                else{
-
-                }
+                aSwitch.setChecked(false);
             }
         });
 
@@ -202,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(this,"We need camera permission to switch on flashlight!", Toast.LENGTH_SHORT).show();
                 }
-                return;
             }
         }
     }
@@ -238,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //turn on the flash
-        flashOn();
+        //flashOn();
     }
 
     protected void flashOn(){
