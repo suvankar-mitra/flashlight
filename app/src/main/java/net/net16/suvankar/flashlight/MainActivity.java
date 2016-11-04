@@ -1,6 +1,7 @@
 package net.net16.suvankar.flashlight;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,8 +26,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.Timer;
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private Switch aSwitch;
+
+    private InterstitialAd mInterstitialAd;
 
 
     @Override
@@ -94,6 +100,37 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         timer.schedule(timerTask, 0, 10000);
+
+        //for interstitial ad on turning the switch off
+        mInterstitialAd = new InterstitialAd(MainActivity.this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-1300395620912543/4131906111");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                if(!lightOn) {
+                    mInterstitialAd.show();
+                }
+            }
+        });
+        TimerTask adTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("TAG","***********************");
+                if(lightOn == false && mInterstitialAd!=null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!mInterstitialAd.isLoaded()) {
+                                AdRequest adRequest = new AdRequest.Builder().build();
+                                mInterstitialAd.loadAd(adRequest);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+        Timer adTimer = new Timer();
+        adTimer.schedule(adTimerTask,1000, 10000);
 
         // load the animation
         animFadein = AnimationUtils.loadAnimation(this, R.anim.fade_in);
@@ -173,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         aSwitch =(Switch)findViewById(R.id.switch1);
         final Intent intent = new Intent(this, ScreenIlluminateActivity.class);
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
@@ -233,6 +271,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         flashOff();
+        if(mInterstitialAd!=null)
+            mInterstitialAd.setAdListener(null);
     }
 
     @Override
@@ -240,6 +280,14 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         //turn on the flash
         //flashOn();
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                if(!lightOn) {
+                    mInterstitialAd.show();
+                }
+            }
+        });
     }
 
     protected void flashOn(){
@@ -266,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
         ring4.startAnimation(animFadein);
         ring4.startAnimation(animFadeout);
         lightOn = true;
+
+
     }
 
     protected  void flashOff() {
